@@ -59,8 +59,8 @@ fn main() {
             primary_window: Some(Window {
                 title: "Snake Game".to_string(),
                 resolution: (
-                    GRID_WIDTH as f32 * CELL_SIZE + 40.0,
-                    GRID_HEIGHT as f32 * CELL_SIZE + 80.0,
+                    (GRID_WIDTH as f32 * CELL_SIZE + 40.0) as u32,
+                    (GRID_HEIGHT as f32 * CELL_SIZE + 80.0) as u32,
                 )
                     .into(),
                 canvas: Some("#game-canvas".to_string()),
@@ -194,10 +194,10 @@ fn spawn_snake(mut commands: Commands, mut snake_body: ResMut<SnakeBody>) {
 }
 
 fn spawn_initial_food(mut commands: Commands) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let food_pos = Position {
-        x: rng.gen_range(0..GRID_WIDTH),
-        y: rng.gen_range(0..GRID_HEIGHT),
+        x: rng.random_range(0..GRID_WIDTH),
+        y: rng.random_range(0..GRID_HEIGHT),
     };
 
     commands.spawn((
@@ -328,11 +328,11 @@ fn check_food_collision(
     positions: Query<&Position>,
     mut grow_pending: ResMut<GrowPending>,
 ) {
-    let Ok(head_pos) = head_query.get_single() else {
+    let Ok(head_pos) = head_query.single() else {
         return;
     };
 
-    let Ok((food_entity, food_pos)) = food_query.get_single() else {
+    let Ok((food_entity, food_pos)) = food_query.single() else {
         return;
     };
 
@@ -342,12 +342,12 @@ fn check_food_collision(
 
         commands.entity(food_entity).despawn();
 
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let mut new_food_pos: Position;
         loop {
             new_food_pos = Position {
-                x: rng.gen_range(0..GRID_WIDTH),
-                y: rng.gen_range(0..GRID_HEIGHT),
+                x: rng.random_range(0..GRID_WIDTH),
+                y: rng.random_range(0..GRID_HEIGHT),
             };
 
             let mut collision = false;
@@ -381,7 +381,7 @@ fn check_wall_collision(
     head_query: Query<&Position, With<SnakeHead>>,
     mut game_over: ResMut<GameOver>,
 ) {
-    let Ok(head_pos) = head_query.get_single() else {
+    let Ok(head_pos) = head_query.single() else {
         return;
     };
 

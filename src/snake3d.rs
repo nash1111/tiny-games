@@ -1,4 +1,3 @@
-use bevy::core_pipeline::tonemapping::Tonemapping;
 use bevy::prelude::*;
 use rand::Rng;
 
@@ -74,7 +73,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Snake 3D - Cube".to_string(),
-                resolution: (800.0, 600.0).into(),
+                resolution: (800, 600).into(),
                 canvas: Some("#game-canvas".to_string()),
                 ..default()
             }),
@@ -115,16 +114,15 @@ fn setup(
 ) {
     commands.spawn((
         Camera3d::default(),
-        Msaa::Off,
-        Tonemapping::ReinhardLuminance,
         Transform::from_xyz(CAMERA_DISTANCE, CAMERA_DISTANCE * 0.8, CAMERA_DISTANCE)
             .looking_at(Vec3::ZERO, Vec3::Y),
         GameCamera,
     ));
 
-    commands.insert_resource(AmbientLight {
+    commands.insert_resource(GlobalAmbientLight {
         color: Color::WHITE,
         brightness: 2000.0,
+        affects_lightmapped_meshes: false,
     });
 
     commands.spawn((
@@ -340,15 +338,15 @@ fn spawn_food(
         commands.entity(entity).despawn();
     }
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let faces = [CubeFace::Top, CubeFace::Bottom, CubeFace::Front, CubeFace::Back, CubeFace::Left, CubeFace::Right];
     let mut food_pos: GridPosition;
 
     loop {
         food_pos = GridPosition {
-            face: faces[rng.gen_range(0..6)],
-            x: rng.gen_range(0..GRID_SIZE),
-            y: rng.gen_range(0..GRID_SIZE),
+            face: faces[rng.random_range(0..6)],
+            x: rng.random_range(0..GRID_SIZE),
+            y: rng.random_range(0..GRID_SIZE),
         };
 
         let mut collision = false;
@@ -595,11 +593,11 @@ fn check_food_collision(
     positions: Query<&GridPosition>,
     mut grow_pending: ResMut<GrowPending>,
 ) {
-    let Ok(head_pos) = head_query.get_single() else {
+    let Ok(head_pos) = head_query.single() else {
         return;
     };
 
-    let Ok((food_entity, food_pos)) = food_query.get_single() else {
+    let Ok((food_entity, food_pos)) = food_query.single() else {
         return;
     };
 
@@ -609,15 +607,15 @@ fn check_food_collision(
 
         commands.entity(food_entity).despawn();
 
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let faces = [CubeFace::Top, CubeFace::Bottom, CubeFace::Front, CubeFace::Back, CubeFace::Left, CubeFace::Right];
         let mut new_food_pos: GridPosition;
 
         loop {
             new_food_pos = GridPosition {
-                face: faces[rng.gen_range(0..6)],
-                x: rng.gen_range(0..GRID_SIZE),
-                y: rng.gen_range(0..GRID_SIZE),
+                face: faces[rng.random_range(0..6)],
+                x: rng.random_range(0..GRID_SIZE),
+                y: rng.random_range(0..GRID_SIZE),
             };
 
             let mut collision = false;
@@ -682,11 +680,11 @@ fn update_camera(
     mut camera_query: Query<&mut Transform, With<GameCamera>>,
     time: Res<Time>,
 ) {
-    let Ok(head_pos) = head_query.get_single() else {
+    let Ok(head_pos) = head_query.single() else {
         return;
     };
 
-    let Ok(mut camera_transform) = camera_query.get_single_mut() else {
+    let Ok(mut camera_transform) = camera_query.single_mut() else {
         return;
     };
 
