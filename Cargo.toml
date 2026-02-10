@@ -3,23 +3,17 @@ name = "tiny-games"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-bevy = { version = "0.15", default-features = false, features = [
-    "bevy_asset",
-    "bevy_winit",
-    "bevy_core_pipeline",
-    "bevy_render",
-    "bevy_sprite",
-    "bevy_text",
-    "bevy_ui",
-    "multi_threaded",
-    "webgl2",
-    "x11",
-] }
-rand = "0.8"
-getrandom = { version = "0.2", features = ["js"] }
+[[bin]]
+name = "snake-2d"
+path = "src/main.rs"
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[[bin]]
+name = "snake-3d"
+path = "src/snake3d.rs"
+
+[dependencies]
+bevy = "0.18"
+rand = "0.9"
 getrandom = { version = "0.3", features = ["wasm_js"] }
 
 [profile.release]
